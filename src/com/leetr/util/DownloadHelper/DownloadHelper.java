@@ -10,7 +10,7 @@ public class DownloadHelper {
     public static final String ACTION_DOWNLOAD = "com.leetr.util.DownloadHelper.ACTION_DOWNLOAD";
     public static final String EXTRA_URL = "com.leetr.util.DownloadHelper.EXTRA_URL";
     public static final String EXTRA_CACHE_PATH = "com.leetr.util.DownloadHelper.EXTRA_CACHE_PATH";
-    public static final String EXTRA_SUCCESS = "com.leetr.util.DownloadHelper.EXTRA_SUCCESS";
-
+    public static final String EXTRA_SUCCESS_DOWNLOAD = "com.leetr.util.DownloadHelper.EXTRA_SUCCESS_DOWNLOAD";
+    public static final String EXTRA_SUCCESS_SAVE_CACHE = "com.leetr.util.DownloadHelper.EXTRA_SUCCESS_SAVE_CACHE";
 
 }
