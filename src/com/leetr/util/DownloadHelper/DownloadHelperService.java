@@ -3,6 +3,7 @@ package com.leetr.util.DownloadHelper;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
+import com.leetr.util.DownloadHelper.listener.OnDownloadListener;
 
 /**
  * Created By: Denis Smirnov <denis@deesastudio.com>
@@ -20,19 +21,31 @@ public class DownloadHelperService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         String url = intent.getStringExtra(DownloadHelper.EXTRA_URL);
-        String cachePath = intent.getStringExtra(DownloadHelper.EXTRA_CACHE_PATH);
+        String cachePath = intent.getStringExtra(DownloadHelper.EXTRA_CACHE_DIR);
+        String cacheFilename = intent.getStringExtra(DownloadHelper.EXTRA_CACHE_FILENAME);
 
-        new DownloadHelperRunnable(url, true, cachePath, null) {
+        new DownloadHelperRunnable(url, cachePath, cacheFilename, new OnDownloadListener() {
+            @Override
+            public void onDownload(String url, byte[] data, String filePath) {
+                broadcastMessage(true, url, filePath, 0);
+            }
 
             @Override
-            public void onDownloadComplete(String url, byte[] data, boolean successDownload, boolean successSaveToCache) {
-                Intent intent = new Intent();
-                intent.setAction(DownloadHelper.ACTION_DOWNLOAD);
-                intent.putExtra(DownloadHelper.EXTRA_URL, url);
-                intent.putExtra(DownloadHelper.EXTRA_SUCCESS_SAVE_CACHE, successSaveToCache);
-                DownloadHelperService.this.sendBroadcast(intent);
+            public void onDownloadFail(String url, int errorBitfield) {
+                broadcastMessage(false, url, null, errorBitfield);
             }
-        }.run();
+        }).run();
+    }
+
+    protected void broadcastMessage(boolean success, String url, String filePath, int errorBitfield) {
+        Intent intent = new Intent();
+        intent.setAction(DownloadHelper.ACTION_DOWNLOAD);
+        intent.putExtra(DownloadHelper.EXTRA_URL, url);
+        intent.putExtra(DownloadHelper.EXTRA_SUCCESS_DOWNLOAD, success);
+        intent.putExtra(DownloadHelper.EXTRA_CACHE_FILEPATH, filePath);
+        intent.putExtra(DownloadHelper.EXTRA_ERROR_BITFIElD, errorBitfield);
+
+        DownloadHelperService.this.sendBroadcast(intent);
     }
 
     @Override
