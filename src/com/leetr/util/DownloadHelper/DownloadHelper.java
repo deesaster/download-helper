@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 
 /**
@@ -35,7 +36,7 @@ public class DownloadHelper {
 
     public static class DownloadHelperAsyncTask extends AsyncTask<String, Void, Void> {
 
-        private OnDownloadListener mListener;
+        private WeakReference<OnDownloadListener> mListenerRef;
         private String mUrl;
         private String mSavedCacheFilepath;
         private byte[] mData;
@@ -45,17 +46,19 @@ public class DownloadHelper {
         public DownloadHelperAsyncTask(OnDownloadListener listener, boolean loadCache) {
             super();
 
-            mListener = listener;
+            mListenerRef = new WeakReference<OnDownloadListener>(listener);
             mLoadCache = loadCache;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mListener != null) {
+            OnDownloadListener listener = mListenerRef.get();
+
+            if (listener != null) {
                 if (mSuccess) {
-                    mListener.onDownload(mUrl, mData, mSavedCacheFilepath);
+                    listener.onDownload(mUrl, mData, mSavedCacheFilepath);
                 } else {
-                    mListener.onDownloadFail(mUrl, mErrorBitfield);
+                    listener.onDownloadFail(mUrl, mErrorBitfield);
                 }
             }
         }
